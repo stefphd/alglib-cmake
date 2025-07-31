@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.11)
 
 project(ALGLIB CXX)
 
-set(libraryname alglib)
+set(LIBNAME alglib)
 
 include(AddWarningsConfigurationToTargets)
 
@@ -69,8 +69,8 @@ endif()
 file(GLOB ALGLIB_HEADERS "${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src/*.h")
 file(GLOB ALGLIB_SOURCES "${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src/*.cpp")
 
-add_library(${libraryname} ${ALGLIB_HEADERS} ${ALGLIB_SOURCES})
-set_property(TARGET ${libraryname} PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(${LIBNAME} ${ALGLIB_HEADERS} ${ALGLIB_SOURCES})
+set_property(TARGET ${LIBNAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set(COMPILER_OPTIONS)
 
@@ -90,22 +90,22 @@ elseif(UNIX)
     endif()
 endif()
 
-target_compile_options(${libraryname} PUBLIC ${COMPILER_OPTIONS})
+target_compile_options(${LIBNAME} PUBLIC ${COMPILER_OPTIONS})
 
 # install
-set_target_properties(${libraryname} PROPERTIES VERSION       ${ALGLIB_VERSION}
+set_target_properties(${LIBNAME} PROPERTIES VERSION       ${ALGLIB_VERSION}
                                                 PUBLIC_HEADER "${ALGLIB_HEADERS}")
 
-target_include_directories(${libraryname} PUBLIC "$<BUILD_INTERFACE:${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src>"
+target_include_directories(${LIBNAME} PUBLIC "$<BUILD_INTERFACE:${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src>"
                                                  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
-install(TARGETS ${libraryname}
-        EXPORT ${libraryname}
+install(TARGETS ${LIBNAME}
+        EXPORT ${LIBNAME}
         COMPONENT runtime
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(EXPORT ${libraryname}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${libraryname})
+install(EXPORT ${LIBNAME}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBNAME})
 
 configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/alglib-config.cmake.in
                               ${CMAKE_BINARY_DIR}/alglib-config.cmake
