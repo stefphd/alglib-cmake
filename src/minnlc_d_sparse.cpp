@@ -15,7 +15,7 @@ https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse
  * library in Windows; see https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html
  * This would require changes in the alglib headers, which is quite annoying.
  * The current workaround is to create instances of the required symbols, and use them in the code 
- * instead of the default ones. As they are global, this are defined as static.
+ * instead of the default ones.
  * Note that this works also when the static library is linked.
  */
 static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
