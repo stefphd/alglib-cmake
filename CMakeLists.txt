@@ -50,13 +50,14 @@ endif()
 include(ExternalProject)
 
 set(ALGLIB_VERSION_FILE "4.05.0" CACHE STRING "Version of ALGLIB.")
+set(ALGLIB_SUBFOLDER_NAME "alglib-cpp") # alglib-cpp for new versions
 string(REPLACE "\"" "" ALGLIB_VERSION ${ALGLIB_VERSION_FILE})
 set(ALGLIB_FILE alglib-${ALGLIB_VERSION_FILE}.cpp.gpl.tgz)
 set(ALGLIB_URI http://www.alglib.net/translator/re/${ALGLIB_FILE})
 set(ALGLIB_DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/alglib)
 set(ALGLIB_FULL_PATH ${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_FILE})
 
-if (NOT EXISTS ${ALGLIB_FULL_PATH})
+if (NOT EXISTS "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}")
     file(DOWNLOAD ${ALGLIB_URI} ${ALGLIB_FULL_PATH} SHOW_PROGRESS STATUS DL_STATUS)
     list(GET DL_STATUS 0 status_code)
     if (NOT status_code EQUAL 0)
@@ -69,7 +70,6 @@ if (NOT EXISTS ${ALGLIB_FULL_PATH})
     endif()
 endif()
 
-set(ALGLIB_SUBFOLDER_NAME "alglib-cpp") # alglib-cpp for new versions
 file(GLOB ALGLIB_HEADERS "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.h")
 file(GLOB ALGLIB_SOURCES "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.cpp")
 
