@@ -22,6 +22,8 @@ $ cmake --build . --config Release --target minnlc_d_sparse
 $ cmake --install . --prefix path/to/install/dir
 ```
 
+The sources of the ALGLIB 4.05.0 Free Edition, released under the GPL license for personal and academic use, are automatically downloaded from the [officicial site](https://www.alglib.net/download.php) into the `alglib` folder. However, if you want to use your own version of ALGLIB, you can place the extracted files into `alglib/`. In such case, you may need to edit `ALGLIB_SUBFOLDER_NAME` in the CMake file, depending on your ALGLIB version.
+
 You can either build a static or a shared (dynamic) library (option `BUILD_SHARED_LIBS`). A test example `minnlc_d_sparse` is also built; see the [ALGLIB doc](https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse).
 
 ### Dynamic library in Windows
