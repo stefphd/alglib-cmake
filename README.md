@@ -30,7 +30,7 @@ To enable the possibility to link a dynamic library version of ALGLIB in Windows
 
 The current workaround is to create local instances of the required symbols, and use them in the code instead of the default ones. This is shown in the test example.
 
-Note that this works also when the static library is linked, altough not strictly necessary.
+Note that this works also when the static library is linked, although not strictly necessary.
 
 ## License 
 alglib-cmake is licensed under either the GNU Lesser General Public License v3.0 : 

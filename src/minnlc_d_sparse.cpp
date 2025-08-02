@@ -16,7 +16,7 @@ https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse
  * This would require changes in the ALGLIB headers, which is quite annoying.
  * The current workaround is to create instances of the required symbols, and use them in the code 
  * instead of the default ones.
- * Note that this works also when the static library is linked, altough not strictly necessary.
+ * Note that this works also when the static library is linked, although not strictly necessary.
  */
 static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
 static const alglib::xparams &xdefault_internal = *((const alglib::xparams *)(&_i64_xdefault));
