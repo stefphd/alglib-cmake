@@ -96,6 +96,13 @@ endif()
 
 target_compile_options(${LIBNAME} PUBLIC ${COMPILER_OPTIONS})
 
+# test
+enable_testing()
+add_executable(minnlc_d_sparse src/minnlc_d_sparse.cpp)
+target_link_libraries(minnlc_d_sparse PRIVATE ${LIBNAME})
+target_include_directories(minnlc_d_sparse PRIVATE ${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src)
+add_test(NAME minnlc_d_sparse COMMAND minnlc_d_sparse)
+
 # install
 set_target_properties(${LIBNAME} PROPERTIES VERSION       ${ALGLIB_VERSION}
                                                 PUBLIC_HEADER "${ALGLIB_HEADERS}")
