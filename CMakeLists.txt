@@ -27,6 +27,10 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
 
+set(CMAKE_INSTALL_BINDIR "bin")
+set(CMAKE_INSTALL_LIBDIR "lib")
+set(CMAKE_INSTALL_INCLUDEDIR "include")
+
 option(ENABLE_RPATH "Enable RPATH for this library" ON)
 mark_as_advanced(ENABLE_RPATH)
 include(AddInstallRPATHSupport)
@@ -49,7 +53,7 @@ set(ALGLIB_VERSION_FILE "4.05.0" CACHE STRING "Version of ALGLIB.")
 string(REPLACE "\"" "" ALGLIB_VERSION ${ALGLIB_VERSION_FILE})
 set(ALGLIB_FILE alglib-${ALGLIB_VERSION_FILE}.cpp.gpl.tgz)
 set(ALGLIB_URI http://www.alglib.net/translator/re/${ALGLIB_FILE})
-set(ALGLIB_DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(ALGLIB_DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/alglib)
 set(ALGLIB_FULL_PATH ${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_FILE})
 
 if (NOT EXISTS ${ALGLIB_FULL_PATH})
@@ -58,16 +62,16 @@ if (NOT EXISTS ${ALGLIB_FULL_PATH})
     if (NOT status_code EQUAL 0)
         message(FATAL_ERROR "Error while downloading '${ALGLIB_URI}'.")
     endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${ALGLIB_FULL_PATH} WORKING_DIRECTORY "${ALGLIB_DOWNLOAD_DIR}" RESULT_VARIABLE rv)
+
+    if(NOT rv EQUAL 0)
+    message(FATAL_ERROR "Error while extracting '${ALGLIB_FULL_PATH}'.")
+    endif()
 endif()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${ALGLIB_FULL_PATH} WORKING_DIRECTORY "${ALGLIB_DOWNLOAD_DIR}" RESULT_VARIABLE rv)
-
-if(NOT rv EQUAL 0)
-  message(FATAL_ERROR "Error while extracting '${ALGLIB_FULL_PATH}'.")
-endif()
-
-file(GLOB ALGLIB_HEADERS "${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src/*.h")
-file(GLOB ALGLIB_SOURCES "${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src/*.cpp")
+set(ALGLIB_SUBFOLDER_NAME "alglib-cpp") # alglib-cpp for new versions
+file(GLOB ALGLIB_HEADERS "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.h")
+file(GLOB ALGLIB_SOURCES "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.cpp")
 
 add_library(${LIBNAME} ${ALGLIB_HEADERS} ${ALGLIB_SOURCES})
 set_property(TARGET ${LIBNAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -96,7 +100,7 @@ target_compile_options(${LIBNAME} PUBLIC ${COMPILER_OPTIONS})
 set_target_properties(${LIBNAME} PROPERTIES VERSION       ${ALGLIB_VERSION}
                                                 PUBLIC_HEADER "${ALGLIB_HEADERS}")
 
-target_include_directories(${LIBNAME} PUBLIC "$<BUILD_INTERFACE:${ALGLIB_DOWNLOAD_DIR}/alglib-cpp/src>"
+target_include_directories(${LIBNAME} PUBLIC "$<BUILD_INTERFACE:${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src>"
                                                  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 install(TARGETS ${LIBNAME}
