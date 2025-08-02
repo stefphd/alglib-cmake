@@ -9,14 +9,14 @@ https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse
 #include <math.h>
 #include "optimization.h"
 
-/** This is to enable the possibility to link a shared-library version of alglib in Windows
- * Basically, the idea is to compile a shared library of alglib with all symbols exported.
+/** This is to enable the possibility to link a shared-library version of ALGLIB in Windows
+ * Basically, the idea is to compile a shared library of ALGLIB with all symbols exported.
  * However, global data symbols need to be declared with __declspec(dllimport) when consuming the 
  * library in Windows; see https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html
- * This would require changes in the alglib headers, which is quite annoying.
+ * This would require changes in the ALGLIB headers, which is quite annoying.
  * The current workaround is to create instances of the required symbols, and use them in the code 
  * instead of the default ones.
- * Note that this works also when the static library is linked.
+ * Note that this works also when the static library is linked, altough not strictly necessary.
  */
 static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
 static const alglib::xparams &xdefault_internal = *((const alglib::xparams *)(&_i64_xdefault));

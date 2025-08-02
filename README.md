@@ -22,15 +22,15 @@ $ cmake --build . --config Release --target minnlc_d_sparse
 $ cmake --install . --prefix path/to/install/dir
 ```
 
-You can either build a static or a shared (dynamic) library (option `BUILD_SHARED_LIBS`.) A test example `minnlc_d_sparse` is also built; see the [ALGLIB doc](https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse).
+You can either build a static or a shared (dynamic) library (option `BUILD_SHARED_LIBS`). A test example `minnlc_d_sparse` is also built; see the [ALGLIB doc](https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse).
 
 ### Dynamic library in Windows
 
-To enable the possibility to link a dynamic library version of ALGLIB in Windows, the library is built with the `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON` option to export all symbols. However, gloval data symbols need to be declared with `__declspec(dllimport)` when consuming the library; see [CMake doc](https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html). This would require changes in the alglib headers, which is quite annoying. 
+To enable the possibility to link a dynamic library version of ALGLIB in Windows, the library is built with the `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON` option to export all symbols. However, global data symbols need to be declared with `__declspec(dllimport)` when consuming the library; see [CMake doc](https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html). This would require changes in the ALGLIB headers, which is quite annoying. 
 
 The current workaround is to create local instances of the required symbols, and use them in the code instead of the default ones. This is shown in the test example.
 
-Note that this works also when the static library is linked.
+Note that this works also when the static library is linked, altough not strictly necessary.
 
 ## License 
 alglib-cmake is licensed under either the GNU Lesser General Public License v3.0 : 
