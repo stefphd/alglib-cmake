@@ -87,11 +87,11 @@ if(MSVC OR MSYS OR MINGW)
 
 elseif(UNIX)
     set(COMPILER_OPTIONS ${COMPILER_OPTIONS} -O3 -DAE_OS=AE_POSIX -pthread)
-    execute_process( COMMAND uname -m OUTPUT_VARIABLE ARCHITECTURE)
+    #execute_process( COMMAND uname -m OUTPUT_VARIABLE ARCHITECTURE)
 
-    if (${ARCHITECTURE} MATCHES "x86_64")
-        set(COMPILER_OPTIONS ${COMPILER_OPTIONS} -DAE_CPU=AE_INTEL)
-    endif()
+    #if (${ARCHITECTURE} MATCHES "x86_64")
+    #    set(COMPILER_OPTIONS ${COMPILER_OPTIONS} -DAE_CPU=AE_INTEL)
+    #endif()
 endif()
 
 target_compile_options(${LIBNAME} PUBLIC ${COMPILER_OPTIONS})
