@@ -10,15 +10,14 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 cmake_minimum_required(VERSION 3.11)
 
-project(ALGLIB CXX)
-
-set(LIBNAME alglib)
+project(ALGLIB LANGUAGES CXX DESCRIPTION "A cross-platform numerical analysis and data processing library" HOMEPAGE_URL "https://www.alglib.net/")
+set(ALGLIB_VERSION "4.06.0")
 
 include(AddWarningsConfigurationToTargets)
-
 include(CMakePackageConfigHelpers)
+include(AddInstallRPATHSupport)
+include(FetchContent)
 
-# Build shared libs
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(MSVC)
@@ -33,13 +32,9 @@ set(CMAKE_INSTALL_INCLUDEDIR "include")
 
 option(ENABLE_RPATH "Enable RPATH for this library" ON)
 mark_as_advanced(ENABLE_RPATH)
-include(AddInstallRPATHSupport)
-add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
-                          LIB_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
-                          DEPENDS ENABLE_RPATH
-                          USE_LINK_PATH)
+add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" LIB_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+                          DEPENDS ENABLE_RPATH USE_LINK_PATH)
 
-# Encourage user to specify a build type (e.g. Release, Debug, etc.), otherwise set it to Release.
 if(NOT CMAKE_CONFIGURATION_TYPES)
   if(NOT CMAKE_BUILD_TYPE)
       message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -47,84 +42,35 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
   endif()
 endif()
 
-include(ExternalProject)
+FetchContent_Declare(alglib URL http://www.alglib.net/translator/re/alglib-${ALGLIB_VERSION}.cpp.gpl.tgz DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_MakeAvailable(alglib)
+file(GLOB ALGLIB_HEADERS "${alglib_SOURCE_DIR}/src/*.h")
+file(GLOB ALGLIB_SOURCES "${alglib_SOURCE_DIR}/src/*.cpp")
 
-set(ALGLIB_VERSION_FILE "4.05.0" CACHE STRING "Version of ALGLIB.")
-set(ALGLIB_SUBFOLDER_NAME "alglib-cpp") # alglib-cpp for new versions
-string(REPLACE "\"" "" ALGLIB_VERSION ${ALGLIB_VERSION_FILE})
-set(ALGLIB_FILE alglib-${ALGLIB_VERSION_FILE}.cpp.gpl.tgz)
-set(ALGLIB_URI http://www.alglib.net/translator/re/${ALGLIB_FILE})
-set(ALGLIB_DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/alglib)
-set(ALGLIB_FULL_PATH ${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_FILE})
-
-if (NOT EXISTS "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}")
-    file(DOWNLOAD ${ALGLIB_URI} ${ALGLIB_FULL_PATH} SHOW_PROGRESS STATUS DL_STATUS)
-    list(GET DL_STATUS 0 status_code)
-    if (NOT status_code EQUAL 0)
-        message(FATAL_ERROR "Error while downloading '${ALGLIB_URI}'.")
-    endif()
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${ALGLIB_FULL_PATH} WORKING_DIRECTORY "${ALGLIB_DOWNLOAD_DIR}" RESULT_VARIABLE rv)
-
-    if(NOT rv EQUAL 0)
-    message(FATAL_ERROR "Error while extracting '${ALGLIB_FULL_PATH}'.")
-    endif()
-endif()
-
-file(GLOB ALGLIB_HEADERS "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.h")
-file(GLOB ALGLIB_SOURCES "${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src/*.cpp")
-
-add_library(${LIBNAME} ${ALGLIB_HEADERS} ${ALGLIB_SOURCES})
-set_property(TARGET ${LIBNAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(alglib ${ALGLIB_SOURCES})
+target_include_directories(alglib PUBLIC "$<BUILD_INTERFACE:${alglib_SOURCE_DIR}/src>" "$<INSTALL_INTERFACE:include>")
+set_property(TARGET alglib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set(COMPILER_OPTIONS)
-
 if(MSVC OR MSYS OR MINGW)
     set(COMPILER_OPTIONS ${COMPILER_OPTIONS} /Ox /DAE_OS=AE_WINDOWS)
     execute_process( COMMAND wmic CPU get Name OUTPUT_VARIABLE CPU_NAME)
     if (${CPU_NAME} MATCHES "Intel")
         set(COMPILER_OPTIONS ${COMPILER_OPTIONS} /DAE_CPU=AE_INTEL)
     endif()
-
 elseif(UNIX)
     set(COMPILER_OPTIONS ${COMPILER_OPTIONS} -O3 -DAE_OS=AE_POSIX -pthread)
-    #execute_process( COMMAND uname -m OUTPUT_VARIABLE ARCHITECTURE)
-
-    #if (${ARCHITECTURE} MATCHES "x86_64")
-    #    set(COMPILER_OPTIONS ${COMPILER_OPTIONS} -DAE_CPU=AE_INTEL)
-    #endif()
 endif()
-
-target_compile_options(${LIBNAME} PUBLIC ${COMPILER_OPTIONS})
+target_compile_options(alglib PUBLIC ${COMPILER_OPTIONS})
 
 # test
-enable_testing()
 add_executable(minnlc_d_sparse src/minnlc_d_sparse.cpp)
-target_link_libraries(minnlc_d_sparse PRIVATE ${LIBNAME})
-target_include_directories(minnlc_d_sparse PRIVATE ${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src)
-add_test(NAME minnlc_d_sparse COMMAND minnlc_d_sparse)
+target_link_libraries(minnlc_d_sparse PRIVATE alglib)
 
 # install
-set_target_properties(${LIBNAME} PROPERTIES VERSION       ${ALGLIB_VERSION}
-                                                PUBLIC_HEADER "${ALGLIB_HEADERS}")
-
-target_include_directories(${LIBNAME} PUBLIC "$<BUILD_INTERFACE:${ALGLIB_DOWNLOAD_DIR}/${ALGLIB_SUBFOLDER_NAME}/src>"
-                                                 "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-
-install(TARGETS ${LIBNAME}
-        EXPORT ${LIBNAME}
-        COMPONENT runtime
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(EXPORT ${LIBNAME}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBNAME})
-
-configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/alglib-config.cmake.in
-                              ${CMAKE_BINARY_DIR}/alglib-config.cmake
-                              INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
-
+set_target_properties(alglib PROPERTIES VERSION ${ALGLIB_VERSION} PUBLIC_HEADER "${ALGLIB_HEADERS}")
+install(TARGETS alglib EXPORT alglib COMPONENT runtime PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT alglib DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
+configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/alglib-config.cmake.in ${CMAKE_BINARY_DIR}/alglib-config.cmake INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/alglib-configVersion.cmake VERSION ${ALGLIB_VERSION} COMPATIBILITY ExactVersion)
-
 install(FILES ${CMAKE_BINARY_DIR}/alglib-config.cmake ${CMAKE_BINARY_DIR}/alglib-configVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
-
-include(AddUninstallTarget)
-
