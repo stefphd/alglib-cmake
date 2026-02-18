@@ -2,3 +2,5 @@ build**/*
 *.user
 alglib/**/
 *.tgz
+/.idea
+/.vscode
