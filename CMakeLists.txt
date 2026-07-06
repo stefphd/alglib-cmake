@@ -11,7 +11,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 cmake_minimum_required(VERSION 3.11)
 
 project(ALGLIB LANGUAGES CXX DESCRIPTION "A cross-platform numerical analysis and data processing library" HOMEPAGE_URL "https://www.alglib.net/")
-set(ALGLIB_VERSION "4.07.0")
+set(ALGLIB_VERSION "4.08.0")
 
 include(AddWarningsConfigurationToTargets)
 include(CMakePackageConfigHelpers)
