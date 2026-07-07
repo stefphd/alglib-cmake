@@ -36,9 +36,8 @@ Note that this works also when the static library is linked, although not strict
 
 ## Notes
 
-- The downloaded ALGLIB version can be changed using the CMake variable `alglib_DOWNLOAD_VERSION` (default `4.08.0`).
+- The ALGLIB download link can be changed using the CMake variable `alglib_DOWNLOAD_LINK` (default downloaded version is `4.08.0`).
 - The actual ALGLIB version is extracted by parsing the ALGLIB header (`ap.h`).
-- A function `const char* alglib_get_version()` returning the ALGLIB version string is also included in the compiled library.
 
 ## License 
 alglib-cmake is licensed under either the GNU Lesser General Public License v3.0 : 
