@@ -11,20 +11,22 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 cmake_minimum_required(VERSION 3.11)
 
 project(ALGLIB LANGUAGES CXX DESCRIPTION "A cross-platform numerical analysis and data processing library" HOMEPAGE_URL "https://www.alglib.net/")
-set(ALGLIB_VERSION "4.08.0")
+
 
 include(AddWarningsConfigurationToTargets)
 include(CMakePackageConfigHelpers)
 include(AddInstallRPATHSupport)
 include(FetchContent)
 
+set(alglib_download_VERSION "4.08.0" CACHE STRING "ALGLIB download version (default: 4.08.0)")
+set(alglib_SOURCE_DIR "${CMAKE_SOURCE_DIR}/alglib" CACHE PATH "Path to the ALGLIB sources (default: alglib)")
+option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif()
-
-option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
 
 set(CMAKE_INSTALL_BINDIR "bin")
 set(CMAKE_INSTALL_LIBDIR "lib")
@@ -42,16 +44,32 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
   endif()
 endif()
 
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/alglib")
-    FetchContent_Declare(alglib URL http://www.alglib.net/translator/re/alglib-${ALGLIB_VERSION}.cpp.gpl.tgz DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+if(NOT EXISTS ${alglib_SOURCE_DIR})
+    set(alglib_DOWNLOAD_LINK http://www.alglib.net/translator/re/alglib-${alglib_download_VERSION}.cpp.gpl.tgz)
+    message(STATUS "Using ALGLIB sources from ${alglib_DOWNLOAD_LINK}")
+    FetchContent_Declare(alglib URL ${alglib_DOWNLOAD_LINK} DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
     FetchContent_MakeAvailable(alglib)
 else()
-    set(alglib_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/alglib")
+    message(STATUS "Using ALGLIB sources from ${alglib_SOURCE_DIR}")
 endif()
-file(GLOB ALGLIB_HEADERS "${alglib_SOURCE_DIR}/src/*.h")
-file(GLOB ALGLIB_SOURCES "${alglib_SOURCE_DIR}/src/*.cpp")
+file(GLOB alglib_HEADERS "${alglib_SOURCE_DIR}/src/*.h")
+file(GLOB alglib_SOURCES "${alglib_SOURCE_DIR}/src/*.cpp")
 
-add_library(alglib ${ALGLIB_SOURCES})
+file(READ "${alglib_SOURCE_DIR}/src/ap.h" alglib_HEADER_CONTENT)
+string(REGEX MATCH "ALGLIB[ \t]+([0-9]+\\.[0-9]+\\.[0-9]+)"
+       _match
+       "${alglib_HEADER_CONTENT}")
+set(alglib_VERSION "${CMAKE_MATCH_1}")
+message(STATUS "ALGLIB version: ${alglib_VERSION}")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.cpp.in"
+    "${CMAKE_BINARY_DIR}/version.cpp"
+    @ONLY
+)
+list(APPEND alglib_SOURCES "${CMAKE_BINARY_DIR}/version.cpp")
+
+add_library(alglib ${alglib_SOURCES})
 target_include_directories(alglib PUBLIC "$<BUILD_INTERFACE:${alglib_SOURCE_DIR}/src>" "$<INSTALL_INTERFACE:include>")
 set_property(TARGET alglib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
@@ -72,9 +90,9 @@ add_executable(minnlc_d_sparse src/minnlc_d_sparse.cpp)
 target_link_libraries(minnlc_d_sparse PRIVATE alglib)
 
 # install
-set_target_properties(alglib PROPERTIES VERSION ${ALGLIB_VERSION} PUBLIC_HEADER "${ALGLIB_HEADERS}")
+set_target_properties(alglib PROPERTIES VERSION ${alglib_VERSION} PUBLIC_HEADER "${alglib_HEADERS}")
 install(TARGETS alglib EXPORT alglib COMPONENT runtime PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT alglib DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
 configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/alglib-config.cmake.in ${CMAKE_BINARY_DIR}/alglib-config.cmake INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/alglib-configVersion.cmake VERSION ${ALGLIB_VERSION} COMPATIBILITY ExactVersion)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/alglib-configVersion.cmake VERSION ${alglib_VERSION} COMPATIBILITY ExactVersion)
 install(FILES ${CMAKE_BINARY_DIR}/alglib-config.cmake ${CMAKE_BINARY_DIR}/alglib-configVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/alglib)

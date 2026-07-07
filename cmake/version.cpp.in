@@ -1,0 +1,3 @@
+const char* alglib_get_version() {
+    return "@alglib_VERSION@";
+}

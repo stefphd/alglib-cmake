@@ -22,7 +22,7 @@ $ cmake --build . --config Release --target minnlc_d_sparse
 $ cmake --install . --prefix path/to/install/dir
 ```
 
-The sources of the ALGLIB 4.08.0 Free Edition, released under the GPL license for personal and academic use, are automatically downloaded from the [officicial site](https://www.alglib.net/download.php) into the `alglib` folder. However, if you want to use your own version of ALGLIB, you can place the extracted files into `alglib/`. In such case, you may need to edit `ALGLIB_SUBFOLDER_NAME` in the CMake file, depending on your ALGLIB version.
+The sources of the ALGLIB 4.08.0 Free Edition, released under the GPL license for personal and academic use, are automatically downloaded from the [officicial site](https://www.alglib.net/download.php) into the `alglib` folder. However, if you want to use your own version of ALGLIB, you may need to edit `ALGLIB_SOURCE_DIR` in the CMake file (default `alglib`).
 
 You can either build a static or a shared (dynamic) library (option `BUILD_SHARED_LIBS`). A test example `minnlc_d_sparse` is also built; see the [ALGLIB doc](https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse).
 
@@ -33,6 +33,10 @@ To enable the possibility to link a dynamic library version of ALGLIB in Windows
 The current workaround is to create local instances of the required symbols, and use them in the code instead of the default ones. This is shown in the test example.
 
 Note that this works also when the static library is linked, although not strictly necessary.
+
+## Notes
+
+- The ALGLIB version can be changed 
 
 ## License 
 alglib-cmake is licensed under either the GNU Lesser General Public License v3.0 : 
