@@ -22,7 +22,7 @@ $ cmake --build . --config Release --target minnlc_d_sparse
 $ cmake --install . --prefix path/to/install/dir
 ```
 
-The sources of the ALGLIB 4.08.0 Free Edition, released under the GPL license for personal and academic use, are automatically downloaded from the [officicial site](https://www.alglib.net/download.php) into the `alglib` folder. However, if you want to use your own version of ALGLIB, you may need to edit `ALGLIB_SOURCE_DIR` in the CMake file (default `alglib`).
+The sources of the ALGLIB 4.08.0 Free Edition, released under the GPL license for personal and academic use, are automatically downloaded from the [officicial site](https://www.alglib.net/download.php) into the `alglib` folder. However, if you want to use your own version of ALGLIB, you may need to edit the CMake variable `alglib_SOURCE_DIR` (default `${CMAKE_SOURCE_DIR}/alglib`).
 
 You can either build a static or a shared (dynamic) library (option `BUILD_SHARED_LIBS`). A test example `minnlc_d_sparse` is also built; see the [ALGLIB doc](https://www.alglib.net/translator/man/manual.cpp.html#example_minnlc_d_sparse).
 
@@ -36,7 +36,9 @@ Note that this works also when the static library is linked, although not strict
 
 ## Notes
 
-- The ALGLIB version can be changed 
+- The downloaded ALGLIB version can be changed using the CMake variable `alglib_DOWNLOAD_VERSION` (default `4.08.0`).
+- The actual ALGLIB version is extracted by parsing the ALGLIB header (`ap.h`).
+- A function `const char* alglib_get_version()` returning the ALGLIB version string is also included in the compiled library.
 
 ## License 
 alglib-cmake is licensed under either the GNU Lesser General Public License v3.0 : 
