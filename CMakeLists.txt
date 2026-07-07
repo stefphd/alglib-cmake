@@ -18,7 +18,7 @@ include(CMakePackageConfigHelpers)
 include(AddInstallRPATHSupport)
 include(FetchContent)
 
-set(alglib_download_VERSION "4.08.0" CACHE STRING "ALGLIB download version (default: 4.08.0)")
+set(alglib_DOWNLOAD_VERSION "4.08.0" CACHE STRING "ALGLIB download version (default: 4.08.0)")
 set(alglib_SOURCE_DIR "${CMAKE_SOURCE_DIR}/alglib" CACHE PATH "Path to the ALGLIB sources (default: alglib)")
 option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
 
@@ -45,7 +45,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 if(NOT EXISTS ${alglib_SOURCE_DIR})
-    set(alglib_DOWNLOAD_LINK http://www.alglib.net/translator/re/alglib-${alglib_download_VERSION}.cpp.gpl.tgz)
+    set(alglib_DOWNLOAD_LINK http://www.alglib.net/translator/re/alglib-${alglib_DOWNLOAD_VERSION}.cpp.gpl.tgz)
     message(STATUS "Using ALGLIB sources from ${alglib_DOWNLOAD_LINK}")
     FetchContent_Declare(alglib URL ${alglib_DOWNLOAD_LINK} DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
     FetchContent_MakeAvailable(alglib)
